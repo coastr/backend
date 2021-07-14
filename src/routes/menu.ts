@@ -1,34 +1,15 @@
 const Router = require("express-promise-router");
-import db from "../db";
+import menu from "../db/menu";
 
 const router = new Router();
 
 module.exports = router;
 
-// import express from "express";
-
-// const router = express.Router();
-
-// router.get("/ping", (req, res, next) => {
-//   // res.send("pong").status(200);
-//   db.query(`SELECT * FROM restaurants`, {}, (err: any, res: any) => {
-//     if (err) {
-//       return next(err);
-//     }
-//     res.send(res.rows[0]);
-//   });
-// });
-
-router.get("/all", async (req: any, res: any) => {
-  const { rows } = await db.query("SELECT * FROM restaurant");
-  console.log("data", rows);
-  res.send(rows);
-});
-
-router.get("/resaruant/", async (req: any, res: any) => {
-  const { rows } = await db.query("SELECT * FROM restaurant");
-  console.log("data", rows);
-  res.send(rows);
+router.get("/item/:id/", async (req: any, res: any) => {
+  const { id } = req.params;
+  const options = await menu.getItemOptionsByItemId(id);
+  console.log("options", options);
+  res.send(options).status(200);
 });
 
 module.exports = router;

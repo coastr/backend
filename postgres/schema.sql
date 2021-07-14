@@ -1,6 +1,6 @@
 -- Create Enums --
 
-CREATE TYPE selector AS ENUM('checkbox', 'radio');
+CREATE TYPE selector AS ENUM('checkbox', 'radio', 'number', 'size');
 
 -- Create Functions
 
@@ -14,7 +14,6 @@ $$ LANGUAGE plpgsql;
 
 
 -- Create tables --
-
 
 CREATE TABLE dev.user (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -100,6 +99,7 @@ CREATE TABLE dev.menu_item_option_category (
     min_options integer NOT NULL, 
     max_options integer NOT NULL, 
     position integer NOT NULL,
+    selector_type selector NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -117,9 +117,8 @@ CREATE TABLE dev.menu_item_option (
     name name NOT NULL,
     description text,
     menu_item_option_category_id uuid NOT NULL,
-    price_delta integer NOT NULL,
+    price_delta numeric NOT NULL,
     calories_delta integer,
-    selector_type selector NOT NULL,
     position integer NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

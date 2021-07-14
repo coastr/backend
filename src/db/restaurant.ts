@@ -7,7 +7,8 @@ const getRestaurantById = async (id: string) => {
 
 const getMenuByRestaurantId = async (id: string) => {
   const { rows } = await db.query(`
-  SELECT menu_category.name AS category_name, menu_item.name AS item_name, menu_item.description, menu_item.price, menu_item.position
+  SELECT menu_category.name AS category_name, menu_item.name AS item_name, menu_item.id AS item_id,
+         menu_item.description, menu_item.price, menu_item.position
   FROM menu_item
   INNER JOIN menu_category ON menu_item.menu_category_id = menu_category.id
   WHERE menu_category.restaurant_id = '${id}'
@@ -30,25 +31,6 @@ const getMenuByRestaurantId = async (id: string) => {
   const menu = Object.values(data);
   return menu;
 };
-// [{
-//   name: "Hot Drinks",
-//   items: [
-//     {name: "mocha", price: 2.50},
-//     {name: "latte", price: 2.50},
-//   ]
-// },
-// {
-//   name: "Cold Drinks",
-//   items: [
-//     {name: "mocha", "price"}
-//   ]
-// }]
-// const getMenu = async (id: string) => {
-
-//     try {
-//         const rows = await db.query('SELECT * FROM ')
-//     }
-// };
 
 export default {
   getRestaurantById,

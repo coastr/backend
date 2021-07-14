@@ -1,5 +1,11 @@
-const { Pool } = require("pg");
+const { Pool, types } = require("pg");
 const pool = new Pool();
+
+// const types = require("pg").types;
+
+types.setTypeParser(1700, (val) => {
+  return parseFloat(val);
+});
 
 export default {
   query: (text: any, params?: any, callback?: any) => {
