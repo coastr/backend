@@ -12,7 +12,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 -- Create tables --
 
 CREATE TABLE dev.account (
