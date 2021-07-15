@@ -15,12 +15,14 @@ $$ LANGUAGE plpgsql;
 
 -- Create tables --
 
-CREATE TABLE dev.user (
+CREATE TABLE dev.account (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     name name NOT NULL,
     email text,
     phone text,
     token text,
+
+    firebase_id text,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -28,7 +30,12 @@ CREATE TABLE dev.user (
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 
-ALTER TABLE dev.user OWNER TO dev;
+CREATE INDEX firebase_id_index ON account USING btree
+(
+	firebase_id
+);
+
+ALTER TABLE dev.account OWNER TO dev;
 
 CREATE TABLE dev.restaurant (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
