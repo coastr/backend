@@ -2,8 +2,8 @@ import db from "./index";
 
 const getItemOptionsByItemId = async (id: string) => {
   const { rows } = await db.query(`
-    SELECT menu_item_option_category.name AS category_name, menu_item_option.name AS option_name, 
-           menu_item_option.price_delta, menu_item_option.position, menu_item_option_category.selector_type, 
+    SELECT menu_item_option_category.name AS category_name, menu_item_option.name AS option_name, menu_item_option.id AS option_id,
+           menu_item_option.default_value, menu_item_option.price_delta, menu_item_option.position, menu_item_option_category.selector_type, 
            menu_item_option_category.min_options, menu_item_option_category.max_options
     FROM menu_item_option
     INNER JOIN menu_item_option_category ON menu_item_option.menu_item_option_category_id = menu_item_option_category.id
