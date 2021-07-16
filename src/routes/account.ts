@@ -1,32 +1,31 @@
-const Router = require("express-promise-router");
+// const Router = require("express-promise-router");
+import express from "express";
 import account from "../db/account";
 import { NextFunction, Request, Response } from "express";
 
 import { authenticateAccount } from "../middleware/auth";
 
-const router = new Router();
+const router = express.Router();
 
-// router.use(authenticateAccount);
+router.use(authenticateAccount);
 
-module.exports = router;
-
-router.get("/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
-  console.log("id", id);
-  const userProfile = await account.getAccountByFirebaseId(id);
+router.get("/", async (req: Request, res: Response) => {
+  const { firebaseId } = req.body;
+  const userProfile = await account.getAccountByFirebaseId(firebaseId);
 
   console.log("userProfile", userProfile);
 
-  res.status(200).send(userProfile).status;
+  res.status(200).send(userProfile);
 });
 
 router.post("/new", async (req: Request, res: Response) => {
-  console.log("req.body", req.body);
-  const { name, email, firebaseId } = req.body;
   try {
+    const { name, email, firebaseId } = req.body;
     await account.postAccount({ name, email, firebaseId });
-    res.send(200);
+    res.sendStatus(201);
   } catch (e) {
-    res.send(500);
+    res.sendStatus(500);
   }
 });
+
+module.exports = router;

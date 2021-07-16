@@ -27,9 +27,7 @@ export const authenticateAccount = (
       req.body.firebaseId = account.uid;
       return next();
     } catch (e) {
-      return res
-        .status(401)
-        .send("You are not authorized to make this request");
+      return res.sendStatus(401);
     }
   });
 };
