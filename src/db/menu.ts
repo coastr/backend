@@ -8,7 +8,7 @@ const getItemOptionsByItemId = async (id: string) => {
     FROM menu_item_option
     INNER JOIN menu_item_option_category ON menu_item_option.menu_item_option_category_id = menu_item_option_category.id
     WHERE menu_item_option_category.menu_item_id = '${id}'
-    ORDER BY menu_item_option.position, menu_item_option_category.position ASC;;
+    ORDER BY menu_item_option.position, menu_item_option_category.position ASC;
     `);
 
   const data = {};
