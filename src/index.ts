@@ -18,4 +18,4 @@ app.use(bodyParser.urlencoded({ extended: false })); // support encoded bodies
 // app.use("/v1.0", require("./routes/index")(app));
 mountRoutes(app);
 
-app.listen(port, () => console.log(`Running on port ${port}`));
+app.listen(port, () => console.log(`Backend running on port ${port}`));
