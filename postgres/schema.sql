@@ -1,6 +1,7 @@
 -- Create Enums --
 
 CREATE TYPE selector AS ENUM('checkbox', 'radio', 'number', 'size');
+CREATE TYPE order_status AS ENUM ('active', 'complete', 'abandoned');
 
 -- Create Functions
 
@@ -144,6 +145,7 @@ CREATE TABLE dev.order (
     account_id uuid NOT NULL,
     restaurant_id uuid NOT NULL,
     tip numeric NOT NULL,
+    status order_status NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

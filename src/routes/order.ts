@@ -10,6 +10,68 @@ const router = express.Router();
 
 router.use(authenticateAccount);
 
+router.get(
+  "/restaurant/:restaurantId/active",
+  async (req: Request, res: Response) => {
+    try {
+      const { restaurantId } = req.params;
+      const { firebaseId } = req.body;
+
+      const { id: accountId } = await account.getAccountIdByFirebaseId(
+        firebaseId
+      );
+
+      const rawOrder = await order.getActiveOrderByAccountIdAndRestaurantId(
+        accountId,
+        restaurantId
+      );
+      const nestedOrder = {};
+
+      if (!rawOrder.length) {
+        res.status(204).send({});
+        return;
+      }
+
+      for (const orderOption of rawOrder) {
+        if (nestedOrder[orderOption.order_item_id]) {
+          nestedOrder[orderOption.order_item_id].options.push({
+            optionName: orderOption.option_name,
+            value: orderOption.value,
+            priceDelta: orderOption.price_delta,
+            orderOptionId: orderOption.order_item_option_id,
+          });
+        } else {
+          nestedOrder[orderOption.order_item_id] = {
+            itemName: orderOption.item_name,
+            numberOfItems: orderOption.item_number,
+            options: [
+              {
+                optionName: orderOption.option_name,
+                value: orderOption.value,
+                priceDelta: orderOption.price_delta,
+                orderOptionId: orderOption.order_item_option_id,
+              },
+            ],
+          };
+        }
+      }
+
+      const formattedOrder = Object.values(nestedOrder);
+      // return formattedOrder;
+
+      const topOrder = {
+        tip: rawOrder[0].tip,
+        items: formattedOrder,
+        orderId: rawOrder[0].order_id,
+      };
+      res.status(200).send(topOrder);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
+  }
+);
+
 router.get("/:id", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -68,45 +130,23 @@ router.post("/:id/item", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     let orderId = id;
-    const {
-      restaurantId,
-      firebaseId,
-      price,
-      menuItemId,
-      numberOfItems,
-      optionValues,
-    } = req.body;
-
-    console.log(
-      restaurantId,
-      firebaseId,
-      price,
-      menuItemId,
-      numberOfItems,
-      optionValues
-    );
+    const { restaurantId, firebaseId, menuItemId, quantity, optionValues } =
+      req.body;
 
     if (
       !restaurantId ||
       !firebaseId ||
       !menuItemId ||
-      !numberOfItems ||
-      !price ||
+      !quantity ||
       !optionValues
     ) {
       res.sendStatus(400);
+      return;
     }
     const { id: accountId } = await account.getAccountIdByFirebaseId(
       firebaseId
     );
     if (!accountId) res.sendStatus(500);
-
-    console.log(
-      "orderId, restaurantId, accountId",
-      orderId,
-      restaurantId,
-      accountId
-    );
 
     if (!validate(orderId)) {
       orderId = await order.createNewOrder({ restaurantId, accountId });
@@ -115,12 +155,11 @@ router.post("/:id/item", async (req: Request, res: Response) => {
     await order.addItemToOrder({
       orderId,
       menuItemId,
-      numberOfItems,
-      price,
+      quantity,
       optionValues,
     });
 
-    res.status(200).send(orderId);
+    res.status(201).send(orderId);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
