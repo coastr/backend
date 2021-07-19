@@ -7,6 +7,13 @@ const getAccountByFirebaseId = async (id: string) => {
   return rows[0];
 };
 
+const getAccountIdByFirebaseId = async (id: string) => {
+  const { rows } = await db.query(
+    `SELECT id FROM account WHERE firebase_id='${id}'`
+  );
+  return rows[0];
+};
+
 const postAccount = async ({ name, email, firebaseId }) => {
   try {
     await db.query(
@@ -21,5 +28,6 @@ const postAccount = async ({ name, email, firebaseId }) => {
 
 export default {
   getAccountByFirebaseId,
+  getAccountIdByFirebaseId,
   postAccount,
 };

@@ -5,5 +5,6 @@ module.exports = (app: any) => {
   app.use("/menu", require("./menu"));
   app.use("/restaurant", require("./restaurant"));
   app.use("/account", require("./account"));
+  app.use("/order", require("./order"));
   return app;
 };
