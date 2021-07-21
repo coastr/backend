@@ -14,6 +14,7 @@ router.get(
   "/restaurant/:restaurantId/active",
   async (req: Request, res: Response) => {
     try {
+      console.log("get active order");
       const { restaurantId } = req.params;
       const { firebaseId } = req.body;
 
@@ -33,31 +34,39 @@ router.get(
       }
 
       for (const orderOption of rawOrder) {
-        if (nestedOrder[orderOption.order_item_id]) {
-          nestedOrder[orderOption.order_item_id].options.push({
-            optionName: orderOption.option_name,
-            value: orderOption.value,
-            priceDelta: orderOption.price_delta,
-            orderOptionId: orderOption.order_item_option_id,
-          });
+        const orderOptionId = orderOption.order_item_option_id;
+        const menuItemOptionId = orderOption.menu_item_option_id;
+        const orderItemId = orderOption.order_item_id;
+
+        const optionObj = {
+          optionName: orderOption.option_name,
+          value: orderOption.value,
+          priceDelta: orderOption.price_delta,
+          orderOptionId,
+          menuItemOptionId,
+        };
+
+        if (nestedOrder[orderItemId]) {
+          nestedOrder[orderItemId].options.push(optionObj);
+          nestedOrder[orderItemId].optionsMap[menuItemOptionId] = optionObj;
         } else {
-          nestedOrder[orderOption.order_item_id] = {
-            itemName: orderOption.item_name,
+          nestedOrder[orderItemId] = {
+            menuItemName: orderOption.menu_item_name,
             numberOfItems: orderOption.item_number,
-            options: [
-              {
-                optionName: orderOption.option_name,
-                value: orderOption.value,
-                priceDelta: orderOption.price_delta,
-                orderOptionId: orderOption.order_item_option_id,
-              },
-            ],
+            orderItemPrice: orderOption.order_item_price,
+            menuItemPrice: orderOption.menu_item_price,
+            orderItemId,
+            menuItemId: orderOption.menu_item_id,
+            description: orderOption.menu_item_description,
+            options: [optionObj],
+            optionsMap: {
+              [menuItemOptionId]: optionObj,
+            },
           };
         }
       }
 
       const formattedOrder = Object.values(nestedOrder);
-      // return formattedOrder;
 
       const topOrder = {
         tip: rawOrder[0].tip,
@@ -112,7 +121,6 @@ router.get("/:id", async (req: Request, res: Response) => {
     }
 
     const formattedOrder = Object.values(nestedOrder);
-    // return formattedOrder;
 
     const topOrder = {
       orderId: id,
@@ -130,6 +138,7 @@ router.post("/:id/item", async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     let orderId = id;
+
     const { restaurantId, firebaseId, menuItemId, quantity, optionValues } =
       req.body;
 
@@ -152,12 +161,14 @@ router.post("/:id/item", async (req: Request, res: Response) => {
       orderId = await order.createNewOrder({ restaurantId, accountId });
     }
 
-    await order.addItemToOrder({
+    const orderItemId = await order.addItemToOrder({
       orderId,
       menuItemId,
       quantity,
       optionValues,
     });
+
+    await order.updateOrderItemPrice(orderItemId);
 
     res.status(201).send(orderId);
   } catch (err) {
@@ -165,5 +176,62 @@ router.post("/:id/item", async (req: Request, res: Response) => {
     res.sendStatus(500);
   }
 });
+
+router.put(
+  "/:orderId/item/:orderItemId",
+  async (req: Request, res: Response) => {
+    try {
+      const { orderId, orderItemId } = req.params;
+
+      const { quantity, optionValues } = req.body;
+
+      if (
+        !validate(orderId) ||
+        !validate(orderItemId) ||
+        !quantity ||
+        !optionValues
+      ) {
+        res.sendStatus(400);
+        return;
+      }
+
+      await order.updateItemInOrder({
+        orderItemId,
+        quantity,
+        optionValues,
+      });
+
+      await order.updateOrderItemPrice(orderItemId);
+
+      res.sendStatus(200);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
+  }
+);
+
+router.delete(
+  "/:orderId/item/:orderItemId",
+  async (req: Request, res: Response) => {
+    try {
+      const { orderId, orderItemId } = req.params;
+      console.log("orderId", orderId);
+      console.log("orderItemId", orderItemId);
+
+      if (!validate(orderId) || !validate(orderItemId)) {
+        res.sendStatus(400);
+        return;
+      }
+
+      await order.deleteItemById(orderItemId);
+
+      res.sendStatus(200);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
+  }
+);
 
 module.exports = router;

@@ -199,12 +199,12 @@ CREATE TABLE dev.order_item_option (
     
     CONSTRAINT order_item_fkey
         FOREIGN KEY(order_item_id) 
-	    REFERENCES dev.order_item(id),
+	    REFERENCES dev.order_item(id)
+        ON DELETE CASCADE,
     
     CONSTRAINT menu_item_option_fkey
         FOREIGN KEY(menu_item_option_id) 
         REFERENCES menu_item_option(id)
-
 );
 
 ALTER TABLE dev.order_item_option OWNER TO dev;
