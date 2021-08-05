@@ -108,7 +108,7 @@ const getActiveOrderByAccountIdAndRestaurantId = async (
     value, 
     tip, 
     dev.order.account_id,
-    dev.order.id AS order_id, 
+    dev.order.id AS order_id,
     order_item.item_number,
     order_item_option.id AS order_item_option_id, 
     order_item.id AS order_item_id, 

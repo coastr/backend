@@ -17,12 +17,13 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE dev.account (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    name name NOT NULL,
+    name name,
     email text,
     phone text,
     token text,
+    is_anonymous boolean NOT NULL,
 
-    firebase_id text,
+    firebase_id text UNIQUE,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

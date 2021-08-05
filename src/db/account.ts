@@ -16,10 +16,15 @@ const getAccountIdByFirebaseId = async (id: string) => {
 
 const postAccount = async ({ name, email, firebaseId }) => {
   try {
-    await db.query(
-      `INSERT INTO account (name, email, firebase_id)
-       VALUES ('${name}', '${email}', '${firebaseId}')`
-    );
+    await db.query(`
+      INSERT INTO account (name, email, firebase_id)
+        VALUES ('${name}', '${email}', '${firebaseId}')
+      ON CONFLICT ON CONSTRAINT firebase_unique
+      DO
+        UPDATE SET 
+          name='${name}',
+          email='${email}';
+    `);
   } catch (error) {
     console.log("error", error);
     throw error;
