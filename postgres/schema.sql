@@ -2,6 +2,7 @@
 
 CREATE TYPE selector AS ENUM('checkbox', 'radio', 'number', 'size');
 CREATE TYPE order_status AS ENUM ('active', 'complete', 'abandoned');
+CREATE type pos_type AS ENUM ('square');
 
 -- Create Functions
 
@@ -46,6 +47,7 @@ CREATE TABLE dev.restaurant (
     phone text,
     logo text,
     colors json,
+    pos pos_type NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

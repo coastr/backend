@@ -2,6 +2,10 @@ require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 });
 
+(BigInt.prototype as any).toJSON = function () {
+  return this.toString();
+};
+
 import express from "express";
 const bodyParser = require("body-parser");
 const cors = require("cors");

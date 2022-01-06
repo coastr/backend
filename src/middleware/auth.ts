@@ -15,16 +15,12 @@ const getAuthToken = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-export const authenticateAccount = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticateAccount = (req: Request, res: Response, next: NextFunction) => {
   getAuthToken(req, res, async () => {
     try {
-      const { authToken } = req.body;
-      const account = await admin.auth().verifyIdToken(authToken);
-      req.body.firebaseId = account.uid;
+      // const { authToken } = req.body;
+      // const account = await admin.auth().verifyIdToken(authToken);
+      // req.body.firebaseId = account.uid;
       return next();
     } catch (e) {
       return res.sendStatus(401);
